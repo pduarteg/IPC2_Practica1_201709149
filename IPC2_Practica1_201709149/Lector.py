@@ -2,6 +2,12 @@ from tkinter import filedialog
 from tkinter import *
 from xml.dom import minidom
 
+import JuegosViejos
+import ListaPlataformas
+import ListaJuegos
+import Juego
+import Plataforma
+
 class Lector:
 
     file_root = None
@@ -9,7 +15,7 @@ class Lector:
     read_done = False
     procesed_data = False
 
-    lista_de_pisos_procesados = None    
+    JuegosViejos = None
 
     def open_a_file(self):
         print("Se cargará un archivo...")
@@ -44,53 +50,103 @@ class Lector:
         return load_correctly
 
     def proces_file(self):
+        self.JuegosViejos = JuegosViejos.JuegosViejos()
+
         if self.procesed_data == False:
 
-            print("Procesando información de patrones de pisos...")
-            print("")
-            self.lista_de_pisos_procesados = Lista_pisos.Lista_pisos()
-            lista_de_pisos = self.file.getElementsByTagName("piso")        
-            cant_pisos = len(lista_de_pisos)
+            print(" *** Procesando información de \"JuegosViejos\"...")
 
-            if cant_pisos != 0:
+            # Procesado de plataformas
 
-                for i in range(cant_pisos):
-                    print("Creando el piso: #" + str(i+1) + "...")
+            print(" *** Procesando información de \"ListaPlataformas\"...")
+            print("")            
+            lect_plataformas = self.file.getElementsByTagName("ListaPlataformas")            
+            lect_plataformas = lect_plataformas[0].getElementsByTagName("Plataforma")
+            platforms_cant = len(lect_plataformas)
+            print(" *** Se encontraron", platforms_cant, "plataformas.")
+
+            new_platforms_list = ListaPlataformas.ListaPlataformas()
+            
+            if platforms_cant != 0:
+
+                for i in range(platforms_cant):
+                    print(" *** Guardando datos de la plataforma: #" + str(i+1) + "...")
                     print("     Verificando datos iniciales...")
 
                     try:
-                        name = lista_de_pisos[i].attributes["nombre"].value
+                        code = lect_plataformas[i].getElementsByTagName("codigo")[0].childNodes[0].data
+                        name = lect_plataformas[i].getElementsByTagName("nombre")[0].childNodes[0].data
                     except:
-                        print("No se han encontrado los atributos requerridos para el piso. ")
-                        print("El piso será omitido.")
+                        print("No se han encontrado los atributos requerridos para la plataforma. ")
+                        print("La plataforma será omitida.")
                         continue
                    
-                    # Recoleección de datos para el i-ésimo piso desde aquí:
-
-                    R = int(lista_de_pisos[i].getElementsByTagName("R")[0].childNodes[0].data)
-                    C = int(lista_de_pisos[i].getElementsByTagName("C")[0].childNodes[0].data)
-                    F = int(lista_de_pisos[i].getElementsByTagName("F")[0].childNodes[0].data)
-                    S = int(lista_de_pisos[i].getElementsByTagName("S")[0].childNodes[0].data)
-
-                    pInicial = lista_de_pisos[i].getElementsByTagName("patron")[0]
-                    codI = pInicial.attributes["codigo"].value
-                    patI = pInicial.childNodes[0].data
-
-                    pFinal = lista_de_pisos[i].getElementsByTagName("patron")[1]
-                    codF = pFinal.attributes["codigo"].value
-                    patF = pFinal.childNodes[0].data
-                  
-                    nuevo_piso = Piso.Piso(name, R, C, F, S, codI, patI, codF, patF)
-                    self.lista_de_pisos_procesados.agregar(nuevo_piso)
+                    # Recoleección de datos para el i-ésima plataforma:
+                    print(f' Se encontró el codigo {code} y nombre {name}')
+                    new_platform = Plataforma.Plataforma(code, name)
+                    new_platforms_list.add_to_list(new_platform)
 
                 print("")
-                print("Información de teerrenos procesada correctamente.")
+                self.JuegosViejos.setPlataformas(new_platforms_list)
+                print(" *** Información de plataformas procesada correctamente.")
                 print("")
 
             else:
                 print("")
-                print("No se han encontrado pisos.")
+                print("No se han encontrado plataformas.")
                 print("")
+
+            # Procesado de juegos
+
+            print(" *** Procesando información de \"ListadoJuegos\"...")
+            print("")            
+            lect_games = self.file.getElementsByTagName("ListadoJuegos")            
+            lect_games = lect_games[0].getElementsByTagName("Juego")
+            games_cant = len(lect_games)
+            print(" *** Se encontraron", games_cant, "juegos.")
+
+            new_games_list = ListaJuegos.ListaJuegos()
+
+            if games_cant != 0:
+
+                for i in range(games_cant):
+                    print(" *** Guardando datos del juego: #" + str(i+1) + "...")
+                    print("     Verificando datos iniciales...")
+
+                    try:
+                        code = lect_games[i].getElementsByTagName("codigo")[0].childNodes[0].data
+                        name = lect_games[i].getElementsByTagName("nombre")[0].childNodes[0].data
+                    except:
+                        print("No se han encontrado los atributos requerridos para la plataforma. ")
+                        print("La plataforma será omitida.")
+                        continue
+                   
+                    # Recolección de plataformas
+                    print(f' Se encontró el codigo {code} y nombre {name}')
+                    lect_sub_platforms = lect_games[i].getElementsByTagName("Plataforma")
+                    new_platforms_list = ListaPlataformas.ListaPlataformas()
+
+                    for j in lect_sub_platforms:
+                        p_code = j.getElementsByTagName("codigo")[0].childNodes[0].data
+                        new_platform = Plataforma.Plataforma(p_code, None)
+                        new_platforms_list.add_to_list(new_platform)
+
+                    new_game = Juego.Juego(code, name, new_platforms_list)
+                    new_games_list.add_to_list(new_game)
+
+
+                print("")
+                self.JuegosViejos.setJuegos(new_games_list)
+                print(" *** Información de juegos procesada correctamente.")
+                print("")
+
+                self.JuegosViejos.print_data()
+
+            else:
+                print("")
+                print("No se han encontrado juegos.")
+                print("")
+            self.procesed_data = True
         else:
             print("Ya se han procesado los datos para el actual archivo cargado en memoria.")
             print("")
@@ -98,7 +154,7 @@ class Lector:
     def reset_all_r(self):
         self.file_root = None
         self.file = None
-        self.read_done = False
-        self.lista_de_pisos_procesados = None
+        self.read_done = False        
         self.procesed_data = False
+        self.JuegosViejos = None
         
