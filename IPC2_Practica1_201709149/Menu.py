@@ -9,7 +9,7 @@ import os
 class Menu:
 
     lector_obj = LectorClass.Lector()
-    escritor_obj = WriterClass.Escritor()
+    writer_obj = WriterClass.Escritor()
 
     def __init__(self, exit):
         self.exit = exit
@@ -20,8 +20,10 @@ class Menu:
         print(" ****************************************************************************")
         print("")
         print("  [1] Cargar archivo")
-        print("  [2] Ordenar y crear salida")
-        print("  [3] Salir")
+        print("  [2] Procesar información de XML de entrada")
+        print("  [3] Ordenar y generar archivo de salida")
+        print("  [4] Mostrar estructuras actualmente.")
+        print("  [5] Salir")
         print("")
         print("Escriba el número de acuerdo a la opción que desee: ")
 
@@ -30,9 +32,8 @@ class Menu:
         print("---------------- Carga de archivos: ----------------")
         print("")
         print(" [1] Escribir dirección")
-        print(" [2] Procesar información de XML de entrada")
-        print(" [3] Ordenar y generar archivo de salida")
-        print(" [4] Regresar al menú principal")
+        print(" [2] Seleccionar archivo")
+        print(" [3] Regresar al menú principal")
         print("")
         print("Escriba el número de acuerdo a la opción que desee: ")
 
@@ -43,7 +44,7 @@ class Menu:
             try:
                 selected_option = int(input())
             except:
-                print("Error de entrada. Intente de nuevo")
+                print(" Error de entrada. Intente de nuevo")
                 print("")
                 continue
             if selected_option == 1:
@@ -54,42 +55,42 @@ class Menu:
                     try:
                         selected_option_l = int(input())
                     except:
-                        print("Error de entrada. Intente de nuevo")
+                        print(" Error de entrada. Intente de nuevo")
                         print("")
                         continue
 
                     if selected_option_l == 1:
                         if self.lector_obj.read_done:
-                            print("Borrando datos anterioes...")
+                            print(" Borrando datos anterioes...")
                         self.lector_obj.reset_all_r()
 
-                        print("Escriba una ruta específica:")
+                        print(" Escriba una ruta específica:")
                         root = input()
                         if root == "":
-                            print("Dirección vacía.")
+                            print(" Dirección vacía.")
                             print("")
                         else:
                             self.lector_obj.file_root = root
                             if self.lector_obj.read_file():
-                                print("Carga realizada exitosamente.")
+                                print(" Carga realizada exitosamente.")
                                 print("")
                                 self.lector_obj.read_done = True                                
                                 back = True
                     elif selected_option_l == 2:
                         if self.lector_obj.read_done:
-                            print("Borrando datos anterioes...")
+                            print(" Borrando datos anterioes...")
                         self.lector_obj.reset_all_r()
 
-                        print("Elija el archivo para cargarlo:")
+                        print(" Elija el archivo para cargarlo:")
 
                         if self.lector_obj.open_a_file():
                             if self.lector_obj.read_file():
-                                print("Carga realizada exitosamente.")
+                                print(" Carga realizada exitosamente.")
                                 print("")
                                 self.lector_obj.read_done = True
                                 back = True
                     elif selected_option_l == 3:
-                        print("Regresando al menú principal.")
+                        print(" Regresando al menú principal.")
                         print("")
                         back = True
                     else:
@@ -105,12 +106,35 @@ class Menu:
                     print("")
             elif selected_option == 3:
                 if self.lector_obj.procesed_data:
-                    print(" __________________ Se procesará la información del archivo de entrada...")
+                    p_list = self.lector_obj.juegosViejos.listaPlataformas
+                    g_list = self.lector_obj.juegosViejos.listaJuegos
+
+                    print(" __________________ Se realizará el ordenamiento...")
+                    p_list.sort_list()
+                    g_list.sort_list()
+                    print(" *** Ordenamiento realizado.")
+                    print("")
+                    print(" __________________ Se realizará la escritura del archivo de salida...")
+
+                    self.writer_obj.write_XML(p_list, g_list)
+                    print(" _____________________________________________________________________")
+                    print("")
+                    print("")
+                    print("")
                 else:
                     print("")
                     print(" [!] Aún no se ha procesado un archivo de entrada.")
                     print("")
             elif selected_option == 4:
+                if self.lector_obj.procesed_data:
+                    print(" __________________ Se mostrarán los datos en memoria...")
+                    print("")
+                    self.lector_obj.juegosViejos.print_data()
+                else:
+                    print("")
+                    print(" [!] Aún no se ha procesado un archivo de entrada.")
+                    print("")
+            elif selected_option == 5:
                 self.exit = True
                 print("")
                 print("Se cerrará el programa.")

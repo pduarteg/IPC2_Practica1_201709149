@@ -16,6 +16,14 @@
 			<codigo>035</codigo>
 			<nombre>Sega</nombre>
 		</Plataforma>
+		<Plataforma>
+			<codigo>001</codigo>
+			<nombre>Sega</nombre>
+		</Plataforma>
+		<Plataforma>
+			<codigo>005</codigo>
+			<nombre>Sega</nombre>
+		</Plataforma>
 	</ListaPlataformas>
 	<ListadoJuegos>
 		<Juego>

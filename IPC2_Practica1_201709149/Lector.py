@@ -50,7 +50,7 @@ class Lector:
         return load_correctly
 
     def proces_file(self):
-        self.JuegosViejos = JuegosViejos.JuegosViejos()
+        self.juegosViejos = JuegosViejos.JuegosViejos()
 
         if self.procesed_data == False:
 
@@ -87,7 +87,7 @@ class Lector:
                     new_platforms_list.add_to_list(new_platform)
 
                 print("")
-                self.JuegosViejos.setPlataformas(new_platforms_list)
+                self.juegosViejos.setPlataformas(new_platforms_list)
                 print(" *** Información de plataformas procesada correctamente.")
                 print("")
 
@@ -136,11 +136,11 @@ class Lector:
 
 
                 print("")
-                self.JuegosViejos.setJuegos(new_games_list)
+                self.juegosViejos.setJuegos(new_games_list)
                 print(" *** Información de juegos procesada correctamente.")
                 print("")
 
-                self.JuegosViejos.print_data()
+                self.juegosViejos.print_data()
 
             else:
                 print("")
